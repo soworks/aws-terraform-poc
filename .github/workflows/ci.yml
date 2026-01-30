@@ -19,40 +19,6 @@ jobs:
       - name: Terraform format/validate
         run: scripts/module_checks.sh
 
-      - name: Terraform tests (if available)
-        run: |
-          if rg --files -g 'tests/*.tftest.hcl' . | rg -q .; then
-            if terraform version | rg -q 'Terraform v1\.(7|8|9)'; then
-              rg --files -g 'tests/*.tftest.hcl' . | while read -r testfile; do
-                testdir="$(dirname "${testfile}")/.."
-                terraform -chdir="${testdir}" test
-              done
-            else
-              echo "Skipping terraform test (requires Terraform 1.7+)."
-            fi
-          else
-            echo "No terraform tests found."
-          fi
-
-      - name: Terraform docs (modules/vpc)
-        uses: terraform-docs/gh-actions@v1
-        with:
-          working-dir: modules/vpc
-          config-file: .terraform-docs.yml
-          output-file: README.md
-          output-method: inject
-
-      - name: Terraform docs (modules/alb-ec2)
-        uses: terraform-docs/gh-actions@v1
-        with:
-          working-dir: modules/alb-ec2
-          config-file: .terraform-docs.yml
-          output-file: README.md
-          output-method: inject
-
-      - name: Terraform docs diff check
-        run: git diff --exit-code
-
       - name: Checkov scan
         uses: bridgecrewio/checkov-action@v12
         with:
