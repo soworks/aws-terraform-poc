@@ -1,0 +1,98 @@
+name: terraform-ci
+
+on:
+  pull_request:
+    branches: ["main"]
+  push:
+    branches: ["**"]
+
+jobs:
+  terraform-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install checkov
+        run: pip install checkov==3.2.497
+
+      - name: Terraform format/validate
+        run: scripts/module_checks.sh
+
+      - name: Terraform tests (if available)
+        run: |
+          if rg --files -g 'tests/*.tftest.hcl' . | rg -q .; then
+            if terraform version | rg -q 'Terraform v1\.(7|8|9)'; then
+              rg --files -g 'tests/*.tftest.hcl' . | while read -r testfile; do
+                testdir="$(dirname "${testfile}")/.."
+                terraform -chdir="${testdir}" test
+              done
+            else
+              echo "Skipping terraform test (requires Terraform 1.7+)."
+            fi
+          else
+            echo "No terraform tests found."
+          fi
+
+      - name: Terraform docs (modules/vpc)
+        uses: terraform-docs/gh-actions@v1
+        with:
+          working-dir: modules/vpc
+          config-file: .terraform-docs.yml
+          output-file: README.md
+          output-method: inject
+
+      - name: Terraform docs (modules/alb-ec2)
+        uses: terraform-docs/gh-actions@v1
+        with:
+          working-dir: modules/alb-ec2
+          config-file: .terraform-docs.yml
+          output-file: README.md
+          output-method: inject
+
+      - name: Terraform docs diff check
+        run: git diff --exit-code
+
+      - name: Checkov scan
+        run: checkov -d . --skip-results-upload --config-file .checkov.yaml
+
+  terraform-plan:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      AWS_REGION: us-east-1
+      AWS_DEFAULT_REGION: us-east-1
+      TF_IN_AUTOMATION: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Plan VPC component
+        run: |
+          terraform -chdir=components/network/vpc init -input=false
+          terraform -chdir=components/network/vpc plan -input=false
+
+      - name: Plan app component
+        run: |
+          terraform -chdir=components/app init -input=false
+          terraform -chdir=components/app plan -input=false

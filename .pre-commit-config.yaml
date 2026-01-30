@@ -1,0 +1,25 @@
+repos:
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.104.0
+    hooks:
+      - id: terraform_fmt
+        files: \.tf$
+  - repo: https://github.com/bridgecrewio/checkov
+    rev: 3.2.497
+    hooks:
+      - id: checkov
+        args: ["-d", ".", "--skip-results-upload", "--config-file", ".checkov.yaml"]
+        always_run: true
+        pass_filenames: false
+  - repo: local
+    hooks:
+      - id: module-checks
+        name: module checks
+        entry: scripts/module_checks.sh
+        language: script
+        pass_filenames: false
+      - id: terraform-docs
+        name: terraform docs
+        entry: scripts/terraform_docs.sh
+        language: script
+        pass_filenames: false
