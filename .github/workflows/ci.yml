@@ -16,14 +16,6 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.x"
-
-      - name: Install checkov
-        run: pip install checkov==3.2.497
-
       - name: Terraform format/validate
         run: scripts/module_checks.sh
 
@@ -62,7 +54,11 @@ jobs:
         run: git diff --exit-code
 
       - name: Checkov scan
-        run: checkov -d . --skip-results-upload --config-file .checkov.yaml
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: .
+          config_file: .checkov.yaml
+          output_format: cli
 
   terraform-plan:
     if: github.event_name == 'pull_request'
