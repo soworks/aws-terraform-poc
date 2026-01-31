@@ -36,8 +36,8 @@ resource "aws_security_group" "alb" {
   tags        = merge(local.common_tags, { Name = "${local.name_prefix}-alb-sg" })
 }
 
-#checkov:skip=CKV_AWS_260:HTTP ingress is required for POC ALB without TLS.
 resource "aws_security_group_rule" "alb_http_in" {
+  #checkov:skip=CKV_AWS_260:HTTP ingress is required for POC ALB without TLS.
   type              = "ingress"
   security_group_id = aws_security_group.alb.id
   from_port         = 80
@@ -47,8 +47,8 @@ resource "aws_security_group_rule" "alb_http_in" {
   description       = "Allow HTTP to ALB"
 }
 
-#checkov:skip=CKV_AWS_382:ALB requires outbound access for target communication.
 resource "aws_security_group_rule" "alb_all_out" {
+  #checkov:skip=CKV_AWS_382:ALB requires outbound access for target communication.
   type              = "egress"
   security_group_id = aws_security_group.alb.id
   from_port         = 0
@@ -75,8 +75,8 @@ resource "aws_security_group_rule" "app_http_in" {
   description              = "Allow HTTP from ALB"
 }
 
-#checkov:skip=CKV_AWS_382:App instances require outbound access for updates.
 resource "aws_security_group_rule" "app_all_out" {
+  #checkov:skip=CKV_AWS_382:App instances require outbound access for updates.
   type              = "egress"
   security_group_id = aws_security_group.app.id
   from_port         = 0
@@ -146,12 +146,12 @@ resource "aws_launch_template" "app" {
   tags = local.common_tags
 }
 
-#checkov:skip=CKV_AWS_150:Deletion protection disabled for ephemeral POC.
-#checkov:skip=CKV_AWS_131:Header dropping not required for POC.
-#checkov:skip=CKV_AWS_91:Access logging omitted for POC.
-#checkov:skip=CKV2_AWS_28:WAF not required for POC.
-#checkov:skip=CKV2_AWS_20:HTTP to HTTPS redirect not configured for POC.
 resource "aws_lb" "this" {
+  #checkov:skip=CKV_AWS_150:Deletion protection disabled for ephemeral POC.
+  #checkov:skip=CKV_AWS_131:Header dropping not required for POC.
+  #checkov:skip=CKV_AWS_91:Access logging omitted for POC.
+  #checkov:skip=CKV2_AWS_28:WAF not required for POC.
+  #checkov:skip=CKV2_AWS_20:HTTP to HTTPS redirect not configured for POC.
   name               = "${local.name_prefix}-alb"
   load_balancer_type = "application"
   subnets            = var.public_subnet_ids
@@ -160,8 +160,8 @@ resource "aws_lb" "this" {
   tags               = merge(local.common_tags, { Name = "${local.name_prefix}-alb" })
 }
 
-#checkov:skip=CKV_AWS_378:HTTP target group required for POC.
 resource "aws_lb_target_group" "app" {
+  #checkov:skip=CKV_AWS_378:HTTP target group required for POC.
   name        = "${local.name_prefix}-tg"
   port        = 80
   protocol    = "HTTP"
@@ -180,9 +180,9 @@ resource "aws_lb_target_group" "app" {
   tags = local.common_tags
 }
 
-#checkov:skip=CKV_AWS_2:HTTP listener required for POC without TLS.
-#checkov:skip=CKV_AWS_103:TLS policy not applicable to HTTP listener.
 resource "aws_lb_listener" "http" {
+  #checkov:skip=CKV_AWS_2:HTTP listener required for POC without TLS.
+  #checkov:skip=CKV_AWS_103:TLS policy not applicable to HTTP listener.
   load_balancer_arn = aws_lb.this.arn
   port              = 80
   protocol          = "HTTP"
