@@ -19,16 +19,16 @@ for dir in "${TF_DIRS[@]}"; do
 
   echo "==> terraform checks: ${dir}"
   if ! terraform -chdir="${path}" fmt -check -diff; then
-    echo "ERROR: terraform fmt failed in ${dir}"
+    echo "❌ ERROR: terraform fmt failed in ${dir}"
     exit 1
   fi
 
   if [[ -d "${path}/.terraform" ]]; then
     if ! terraform -chdir="${path}" validate; then
-      echo "ERROR: terraform validate failed in ${dir}"
+      echo "❌ ERROR: terraform validate failed in ${dir}"
       exit 1
     fi
   else
-    echo "Skipping validate (no .terraform). Run terraform init to enable."
+    echo "ℹ️  Skipping validate (no .terraform). Run terraform init to enable."
   fi
 done
