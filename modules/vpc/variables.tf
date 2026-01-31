@@ -12,7 +12,7 @@ variable "cidr_block" {
 variable "public_subnet_count" {
   type        = number
   description = "Number of public subnets to create."
-  default     = 3
+  default     = 2
 
   validation {
     condition     = var.public_subnet_count >= 1 && var.public_subnet_count <= 6
@@ -23,7 +23,7 @@ variable "public_subnet_count" {
 variable "private_subnet_count" {
   type        = number
   description = "Number of private subnets to create."
-  default     = 3
+  default     = 2
 
   validation {
     condition     = var.private_subnet_count >= 1 && var.private_subnet_count <= 6
