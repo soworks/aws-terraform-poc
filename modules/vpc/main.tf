@@ -33,6 +33,7 @@ locals {
 }
 
 resource "aws_vpc" "this" {
+  #checkov:skip=CKV2_AWS_11: "VPC flow logs not required for this POC"
   cidr_block           = var.cidr_block
   enable_dns_support   = var.enable_dns_support
   enable_dns_hostnames = var.enable_dns_hostnames
@@ -52,6 +53,7 @@ resource "aws_internet_gateway" "this" {
 }
 
 resource "aws_subnet" "public" {
+  #checkov:skip=CKV_AWS_130: "Public subnets intentionally assign public IPs"
   for_each                = { for i in range(var.public_subnet_count) : i => i }
   vpc_id                  = aws_vpc.this.id
   cidr_block              = local.public_subnet_cidrs[each.key]
