@@ -1,5 +1,5 @@
 framework: terraform
 quiet: true
 download-external-modules: false
-soft-fail: true
+soft-fail: false
 skip-results-upload: true
