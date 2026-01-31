@@ -19,4 +19,3 @@ max_files = 50
 max_diff_chars = 200000
 suggestions = true
 include_tests = false
-"""
