@@ -7,7 +7,7 @@ on:
     branches: ["**"]
 
 jobs:
-  terraform-checks:
+  ci-checks:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -27,6 +27,7 @@ jobs:
           output_format: cli
           quiet: true
           framework: terraform
+          soft_fail: false
 
   terraform-plan:
     if: github.event_name == 'pull_request'
