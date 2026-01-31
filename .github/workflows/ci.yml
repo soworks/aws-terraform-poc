@@ -7,7 +7,7 @@ on:
     branches: ["**"]
 
 jobs:
-  terraform-checks:
+  ci-checks:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -27,6 +27,7 @@ jobs:
           output_format: cli
           quiet: true
           framework: terraform
+          soft_fail: false
 
   terraform-plan:
     if: github.event_name == 'pull_request'
@@ -34,6 +35,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
+      pull-requests: write
     env:
       AWS_REGION: us-east-1
       AWS_DEFAULT_REGION: us-east-1
@@ -54,9 +56,38 @@ jobs:
       - name: Plan VPC component
         run: |
           terraform -chdir=components/network/vpc init -input=false
-          terraform -chdir=components/network/vpc plan -input=false
+          terraform -chdir=components/network/vpc plan -input=false -no-color > /tmp/plan-vpc.txt
 
       - name: Plan app component
         run: |
           terraform -chdir=components/app init -input=false
-          terraform -chdir=components/app plan -input=false
+          terraform -chdir=components/app plan -input=false -no-color > /tmp/plan-app.txt
+
+      - name: Build plan comment
+        run: |
+          {
+            echo "## Terraform plan (PR)"
+            echo
+            echo "<details>"
+            echo "<summary>VPC plan</summary>"
+            echo
+            echo '```'
+            cat /tmp/plan-vpc.txt
+            echo '```'
+            echo "</details>"
+            echo
+            echo "<details>"
+            echo "<summary>App plan</summary>"
+            echo
+            echo '```'
+            cat /tmp/plan-app.txt
+            echo '```'
+            echo "</details>"
+          } > /tmp/plan-comment.md
+
+      - name: Post plan to PR comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-identifier: terraform-plan
+          body-file: /tmp/plan-comment.md
