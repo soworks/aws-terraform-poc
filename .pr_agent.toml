@@ -1,0 +1,22 @@
+[pr_agent]
+name = "GenLogs IaC Reviewer"
+
+[model]
+provider = "openai"
+model = "gpt-4o"
+
+[github]
+pr_comment_prompt = """
+You are a Terraform IaC reviewer for AWS.
+Focus on: security, networking, IAM least privilege, state/backends, cost, and best practices.
+Look for misconfigurations, missing tags, unsafe defaults, and CI/CD issues.
+Provide concise, actionable feedback with file references.
+"""
+
+[review]
+auto_review = true
+max_files = 50
+max_diff_chars = 200000
+suggestions = true
+include_tests = false
+"""
