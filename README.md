@@ -75,6 +75,8 @@ The `pr-agent` workflow posts AI-generated PR descriptions, reviews, and code
 suggestions directly on pull requests. It uses the `OPENAI_KEY` secret and runs
 only for newly opened or reopened PRs.
 
+Repo: https://github.com/qodo-ai/pr-agent
+
 ## Checkov
 
 Checkov is a static analysis tool for IaC. It scans Terraform for common
