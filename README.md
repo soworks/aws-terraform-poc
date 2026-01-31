@@ -10,6 +10,7 @@ with a fun landing page (and optional uWSGI app).
 - `components/app/` provisions the ALB + EC2 via the `modules/alb-ec2` module.
 - `modules/` contains reusable Terraform modules.
 - `scripts/` includes CI helper scripts.
+- `modules/alb-ec2/scripts/` contains the EC2 user data script.
 
 ## Prereqs
 
@@ -64,10 +65,26 @@ pre-commit run --all-files
 ## CI
 
 GitHub Actions runs:
-- `terraform fmt` and `terraform validate`
-- `terraform-docs` with README diff check
-- `checkov` scans
-- `terraform plan` on PRs (via GitHub OIDC)
+- `terraform fmt` and `terraform validate` via `scripts/module_checks.sh`
+- `checkov` scans for Terraform security and compliance issues
+- `terraform plan` on PRs only, posting a sticky comment (via GitHub OIDC)
+
+## PR-Agent
+
+The `pr-agent` workflow posts AI-generated PR descriptions, reviews, and code
+suggestions directly on pull requests. It uses the `OPENAI_KEY` secret and runs
+only for newly opened or reopened PRs.
+
+Repo: https://github.com/qodo-ai/pr-agent
+
+## Checkov
+
+Checkov is a static analysis tool for IaC. It scans Terraform for common
+security misconfigurations and policy violations.
+
+References:
+- https://www.checkov.io/
+- https://github.com/bridgecrewio/checkov
 
 ## GitHub Actions (OIDC)
 
