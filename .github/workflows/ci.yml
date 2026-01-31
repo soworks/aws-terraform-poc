@@ -25,6 +25,8 @@ jobs:
           directory: .
           config_file: .checkov.yaml
           output_format: cli
+          quiet: true
+          framework: terraform
 
   terraform-plan:
     if: github.event_name == 'pull_request'
