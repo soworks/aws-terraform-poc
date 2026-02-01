@@ -30,13 +30,13 @@ variable "cidr_block" {
 variable "public_subnet_count" {
   type        = number
   description = "Number of public subnets to create."
-  default     = 2
+  default     = 3
 }
 
 variable "private_subnet_count" {
   type        = number
   description = "Number of private subnets to create."
-  default     = 2
+  default     = 3
 }
 
 variable "subnet_newbits" {
