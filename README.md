@@ -1,4 +1,4 @@
-# aws-terraform-poc
+de# aws-terraform-poc
 
 Terraform POC that creates a VPC, ALB, and an application server running Nginx
 with a fun landing page (and optional uWSGI app).
@@ -88,7 +88,7 @@ References:
 
 ## GitHub Actions (OIDC)
 
-The bootstrap stack now creates a GitHub Actions OIDC provider and IAM role for
+The bootstrap stack  creates a GitHub Actions OIDC provider and IAM role for
 CI plans.
 
 1. Apply the bootstrap stack:
